@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: myapp
+  annotations:
+    cnck.github.com/render: myapp.yaml.template
+    cnck.github.com/refresh: 1m
+data:
+  myapp.yaml.template: |
+    log-file: /var/log/myapp.log
+    database-url: <%
+        let addresses = [];
+        let databases = k8s.select({kind: 'Pod', labels: {app: 'mariadb'}});
+        for (let d = 0; d < databases.length; d++)
+            addresses.push(databases[d].status.podIP);
+        write('jdbc:mariadb:loadbalance://' + addresses.join(',') + '/mydb');
+    %>

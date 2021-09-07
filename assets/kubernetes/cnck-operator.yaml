@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: ServiceAccount
+
+metadata:
+  name: cnck
+  namespace: !!string $NAMESPACE
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+
+metadata:
+  name: cnck
+  namespace: !!string $NAMESPACE
+
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+
+metadata:
+  name: cnck
+  namespace: !!string $NAMESPACE
+
+subjects:
+- kind: ServiceAccount
+  name: cnck
+  namespace: !!string $NAMESPACE # required
+
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cnck # must be in our namespace
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: cnck-operator
+  namespace: !!string $NAMESPACE
+  labels:
+    app.kubernetes.io/name: cnck-operator
+    app.kubernetes.io/instance: cnck-operator-$NAMESPACE
+    app.kubernetes.io/version: !!string $VERSION
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/part-of: cnck
+    app.kubernetes.io/managed-by: cnck
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cnck-operator
+      app.kubernetes.io/instance: cnck-operator-$NAMESPACE
+      app.kubernetes.io/version: !!string $VERSION
+      app.kubernetes.io/component: operator
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cnck-operator
+        app.kubernetes.io/instance: cnck-operator-$NAMESPACE
+        app.kubernetes.io/version: !!string $VERSION
+        app.kubernetes.io/component: operator
+        app.kubernetes.io/part-of: cnck
+        app.kubernetes.io/managed-by: cnck
+    spec:
+      serviceAccountName: cnck # must be in our namespace
+      containers:
+      - name: operator
+        image: docker.io/tliron/cnck-operator:latest
+        imagePullPolicy: Always
+        env:
+        # Vars with the "CNCK_OPERATOR_" prefix become CLI flags 
+        - name: CNCK_OPERATOR_concurrency
+          value: '3'
+        - name: CNCK_OPERATOR_verbose
+          value: '1'
+        # To enable cluster mode we also need: cluster-mode-authorization.yaml
+        #- name: CNCK_OPERATOR_cluster
+        #  value: 'true'
+        livenessProbe:
+          httpGet:
+            port: 8086
+            path: /live
+        readinessProbe:
+          httpGet:
+            port: 8086
+            path: /ready

@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+. "$HERE/../scripts/_env"
+. "$ROOT/scripts/_trap"
+
+minikube profile central
+"$ROOT/scripts/delete"
+kubectl delete --namespace="$NAMESPACE" --wait -f "$ROOT/examples/hello-world/hello-world.yaml" || true
+kubectl delete events --all --namespace="$NAMESPACE"
+
+if [ "$1" == -b ]; then
+	"$ROOT/scripts/build-container-image"
+	"$ROOT/scripts/publish-container-image"
+	# Reminder: clean ~/.local/share/containers/ occassionally!
+fi
+
+"$ROOT/scripts/deploy"
+
+kubectl config set-context --current --namespace="$NAMESPACE"
+kubectl apply -f "$ROOT/examples/hello-world/hello-world.yaml"

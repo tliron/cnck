@@ -1,5 +1,3 @@
-*This is a placeholder project with no code yet*
-
 CNCK
 ====
 
@@ -9,8 +7,8 @@ CNCK
 
 CNCK = Cloud Native Configurations for Kubernetes
 
-Make your Kubernetes applications more cloud native by using and embedding runtime cluster
-information in your ConfigMaps and other configuration files.
+Make your Kubernetes applications more cloud native by injecting runtime cluster information into your
+ConfigMaps.
 
 CNCK is a Kubernetes operator that renders text templates with simple JavaScript scriptlets that can query
 Kubernetes resources to pull data and generate contextual configuration text. It can continuously keep your
@@ -34,9 +32,8 @@ data:
     database-url: <%
         let addresses = [];
         let databases = k8s.select({kind: 'Pod', labels: {app: 'mariadb'}});
-        for (let d in databases) {
-            addresses.push(d.status.podIP);
-        }
+        for (let d = 0; d < databases.length; d++)
+            addresses.push(databases[d].status.podIP);
         write('jdbc:mariadb:loadbalance://' + addresses.join(',') + '/mydb');
     %>
 ```

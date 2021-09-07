@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+. "$HERE/_env"
+. "$HERE/_trap"
+
+export VERSION=1.0
+
+m "deleting operator from namespace \"$NAMESPACE\"..."
+
+kubectl_delete_template "$ROOT/assets/kubernetes/cnck-operator.yaml"
