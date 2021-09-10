@@ -27,24 +27,8 @@ func Compile(content string) (string, error) {
 					continue
 				}
 
-				// Swallow trailing newline by default
-				swallowTrailingNewline := true
-
-				if content[tag.end-3] == '/' {
-					// Disable the swallowing of trailing newline
-					code = code[:len(code)-1]
-					swallowTrailingNewline = false
-				}
-
 				builder.Builder.WriteString(trimmedCode)
 				builder.Builder.WriteRune('\n')
-
-				if swallowTrailingNewline {
-					// Skip trailing newline
-					if (tag.end <= final) && (content[tag.end] == '\n') {
-						last++
-					}
-				}
 			}
 
 			if last <= final {
@@ -54,7 +38,7 @@ func Compile(content string) (string, error) {
 		}
 
 		string_ := builder.Builder.String()
-		//log.Debugf("%s", string_)
+		//fmt.Printf("%s\n", string_)
 
 		return string_, nil
 	} else {

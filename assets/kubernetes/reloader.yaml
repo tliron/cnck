@@ -1,0 +1,158 @@
+# Modified from:
+#  https://github.com/stakater/Reloader/blob/v0.0.99/deployments/kubernetes/reloader.yaml
+
+---
+# Source: reloader/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    meta.helm.sh/release-namespace: !!string $NAMESPACE
+    meta.helm.sh/release-name: "stakater"
+  labels:
+    app: stakater-reloader
+    chart: "reloader-v0.0.99"
+    release: "stakater"
+    heritage: "Helm"
+    app.kubernetes.io/managed-by: "Helm"
+  name: stakater-reloader
+---
+# Source: reloader/templates/clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+
+kind: ClusterRole
+metadata:
+  annotations:
+    meta.helm.sh/release-namespace: !!string $NAMESPACE
+    meta.helm.sh/release-name: "stakater"
+  labels:
+    app: stakater-reloader
+    chart: "reloader-v0.0.99"
+    release: "stakater"
+    heritage: "Helm"
+    app.kubernetes.io/managed-by: "Helm"
+  name: stakater-reloader-role
+  namespace: !!string $NAMESPACE
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+      - configmaps
+    verbs:
+      - list
+      - get
+      - watch
+  - apiGroups:
+      - "apps"
+    resources:
+      - deployments
+      - daemonsets
+      - statefulsets
+    verbs:
+      - list
+      - get
+      - update
+      - patch
+  - apiGroups:
+      - "extensions"
+    resources:
+      - deployments
+      - daemonsets
+    verbs:
+      - list
+      - get
+      - update
+      - patch
+---
+# Source: reloader/templates/clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    meta.helm.sh/release-namespace: !!string $NAMESPACE
+    meta.helm.sh/release-name: "stakater"
+  labels:
+    app: stakater-reloader
+    chart: "reloader-v0.0.99"
+    release: "stakater"
+    heritage: "Helm"
+    app.kubernetes.io/managed-by: "Helm"
+  name: stakater-reloader-role-binding
+  namespace: !!string $NAMESPACE
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: stakater-reloader-role
+subjects:
+  - kind: ServiceAccount
+    name: stakater-reloader
+    namespace: !!string $NAMESPACE
+---
+# Source: reloader/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    meta.helm.sh/release-namespace: !!string $NAMESPACE
+    meta.helm.sh/release-name: "stakater"
+  labels:
+    app: stakater-reloader
+    chart: "reloader-v0.0.99"
+    release: "stakater"
+    heritage: "Helm"
+    app.kubernetes.io/managed-by: "Helm"
+    group: com.stakater.platform
+    provider: stakater
+    version: v0.0.99
+  name: stakater-reloader
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: stakater-reloader
+      release: "stakater"
+  template:
+    metadata:
+      labels:
+        app: stakater-reloader
+        chart: "reloader-v0.0.99"
+        release: "stakater"
+        heritage: "Helm"
+        app.kubernetes.io/managed-by: "Helm"
+        group: com.stakater.platform
+        provider: stakater
+        version: v0.0.99
+    spec:
+      containers:
+      - image: "stakater/reloader:v0.0.99"
+        imagePullPolicy: IfNotPresent
+        name: stakater-reloader
+        env:
+        - name: KUBERNETES_NAMESPACE
+          value: !!string $NAMESPACE
+        ports:
+        - name: http
+          containerPort: 9090
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: http
+          timeoutSeconds: 5
+          failureThreshold: 5
+          periodSeconds: 10
+          successThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: http
+          timeoutSeconds: 5
+          failureThreshold: 5
+          periodSeconds: 10
+          successThreshold: 1
+      securityContext: 
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: stakater-reloader

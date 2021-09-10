@@ -35,7 +35,7 @@ function kubectl_apply_template () {
 }
 
 function kubectl_delete_template () {
-	cat "$1" | NAMESPACE=$NAMESPACE envsubst | kubectl delete -f - || true
+	cat "$1" | NAMESPACE=$NAMESPACE envsubst | kubectl delete --wait -f - || true
 }
 
 function kubectl_wait_for_deployment () {

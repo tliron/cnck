@@ -89,7 +89,7 @@ spec:
       - name: main
         image: myimage
         volumeMounts:
-        - mountPath: /etc # will have a "myapp.yaml" file
+        - mountPath: /etc/myapp # will have a "myapp.yaml" file
           name: config
       volumes:
       - name: config

@@ -36,14 +36,14 @@ func (self *Controller) processConfigMap(configMap *core.ConfigMap) (bool, error
 	if templateName, ok := configMap.Annotations[annotationRender]; ok {
 		if strings.HasSuffix(templateName, templateSuffix) {
 			if template, ok := configMap.Data[templateName]; ok {
-				if scriptlet, err := js.Compile(template); err == nil {
+				if script, err := js.Compile(template); err == nil {
 					renderedName := templateName[:len(templateName)-len(templateSuffix)]
 
 					urlContext := urlpkg.NewContext()
 					defer urlContext.Release()
 					context := js.NewContext(self.Namespace, self.Dynamic, self.Context, urlContext, logging.NewSubLogger(self.Log, "js"))
 
-					if rendered, err := context.Render(scriptlet); err == nil {
+					if rendered, err := context.Render(script); err == nil {
 						self.Log.Infof("rendered: %s", renderedName)
 
 						exists := false

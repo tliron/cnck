@@ -7,6 +7,7 @@ HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
 
 minikube profile central
 "$ROOT/scripts/delete"
+kubectl_delete_template "$ROOT/assets/kubernetes/reloader.yaml"
 kubectl delete --namespace="$NAMESPACE" --wait -f "$ROOT/examples/hello-world/hello-world.yaml" || true
 kubectl delete events --all --namespace="$NAMESPACE"
 
@@ -19,4 +20,6 @@ fi
 "$ROOT/scripts/deploy"
 
 kubectl config set-context --current --namespace="$NAMESPACE"
+kubectl_apply_template "$ROOT/assets/kubernetes/reloader.yaml"
 kubectl apply -f "$ROOT/examples/hello-world/hello-world.yaml"
+#kubectl exec $(kubectl get pods --selector=app=myapp --output=jsonpath={.items[0].metadata.name}) -- cat /etc/myapp/myapp.yaml

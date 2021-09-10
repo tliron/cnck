@@ -1,10 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: myapp
+  labels:
+    app: myapp
+  annotations:
+    reloader.stakater.com/auto: "true"
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+        - name: main
+          image: k8s.gcr.io/echoserver:1.4
+          volumeMounts:
+          - mountPath: /etc/myapp # will have a "myapp.yaml" file
+            name: config
+      volumes:
+      - name: config
+        configMap:
+          name: myapp
+
+---
+
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: db1
+  labels:
+    app: mariadb
+
+spec:
+  containers:
+    - name: main
+      image: k8s.gcr.io/echoserver:1.4
+
+---
+
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: db2
+  labels:
+    app: mariadb
+
+spec:
+  containers:
+    - name: main
+      image: k8s.gcr.io/echoserver:1.4
+
+---
+
 apiVersion: v1
 kind: ConfigMap
+
 metadata:
   name: myapp
   annotations:
     cnck.github.com/render: myapp.yaml.template
     cnck.github.com/refresh: 1m
+
 data:
   myapp.yaml.template: |
     log-file: /var/log/myapp.log
