@@ -76,6 +76,8 @@ data:
     database-url: <%
         let addresses = [];
         let databases = k8s.select({kind: 'Pod', labels: {app: 'mariadb'}});
+        if (databases.length === 0)
+          throw 'no database nodes';
         for (let d = 0; d < databases.length; d++)
             addresses.push(databases[d].status.podIP);
         write('jdbc:mariadb:loadbalance://' + addresses.join(',') + '/mydb');

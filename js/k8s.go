@@ -2,7 +2,9 @@ package js
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/tliron/kutil/ard"
 	kubernetesutil "github.com/tliron/kutil/kubernetes"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -17,29 +19,26 @@ type K8s struct {
 	context   context.Context
 }
 
-func (self *K8s) Select(arg map[string]interface{}) ([]map[string]interface{}, error) {
+func (self *K8s) Select(config ard.StringMap) ([]ard.StringMap, error) {
 	var gvk schema.GroupVersionKind
-	gvk.Version = "v1"
-
-	namespace := self.namespace
+	var namespace string
 	labels := make(map[string]string)
 
-	if group, ok := arg["group"]; ok {
-		gvk.Group = group.(string)
+	node := ard.NewNode(config)
+	gvk.Group, _ = node.Get("group").String(false)
+	gvk.Version, _ = node.Get("version").String(false)
+	if gvk.Version == "" {
+		gvk.Version = "v1"
 	}
-	if version, ok := arg["version"]; ok {
-		gvk.Version = version.(string)
+	gvk.Kind, _ = node.Get("kind").String(false)
+	namespace, _ = node.Get("namespace").String(false)
+	if namespace == "" {
+		namespace = self.namespace
 	}
-	if kind, ok := arg["kind"]; ok {
-		gvk.Kind = kind.(string)
-	}
-	if namespace_, ok := arg["namespace"]; ok {
-		namespace = namespace_.(string)
-	}
-	if labels_, ok := arg["labels"]; ok {
-		labels__ := labels_.(map[string]interface{})
-		for key, value := range labels__ {
-			labels[key] = value.(string)
+
+	if labels_, ok := node.Get("labels").StringMap(false); ok {
+		for key, value := range labels_ {
+			labels[key] = fmt.Sprintf("%s", value)
 		}
 	}
 

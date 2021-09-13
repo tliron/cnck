@@ -15,9 +15,14 @@ metadata:
   namespace: !!string $NAMESPACE
 
 rules:
-- apiGroups: ["*"]
-  resources: ["*"]
-  verbs: ["*"]
+# We need to update configmaps
+- apiGroups: [ "" ]
+  resources: [ configmaps ]
+  verbs: [ get, list, watch, update ]
+# Read access for k8s JavaScript API
+- apiGroups: [ "" ]
+  resources: [ pods, deployments, daemonsets, statefulsets, jobs, services, endpoints ]
+  verbs: [ get, list ]
 
 ---
 

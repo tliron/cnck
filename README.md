@@ -15,6 +15,10 @@ Kubernetes resources to pull data and generate contextual configuration text. It
 configurations up to date. Couple it with the [Reloader operator](https://github.com/stakater/Reloader) that
 will make sure to restart your components when the configurations change.
 
+
+How It Works
+------------
+
 An example of a ConfigMap with an embedded scriptlet to gather all running database pods and configure a
 loadbalancing connection to them:
 
@@ -37,8 +41,6 @@ data:
         write('jdbc:mariadb:loadbalance://' + addresses.join(',') + '/mydb');
     %>
 ```
-
-How it works:
 
 1. CNCK will detect the annotation and render the "myapp.yaml.template" data.
 2. The scriptlet embedded in the `<%` and `%>` delimiters will be run.
@@ -96,3 +98,14 @@ spec:
         configMap:
           name: myapp # the name of the ConfigMap to mount
 ```
+
+See the [examples directory](examples/) for more information.
+
+
+Installation
+------------
+
+You can install the operator using [this manifest](assets/kubernetes/cnck-operator.yaml) as a template.
+For example:
+
+    curl -s https://raw.githubusercontent.com/tliron/cnck/main/assets/kubernetes/cnck-operator.yaml | NAMESPACE=default VERSION=1.0 envsubst | kubectl apply -f -
