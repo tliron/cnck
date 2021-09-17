@@ -19,11 +19,11 @@ spec:
         app: myapp
     spec:
       containers:
-        - name: main
-          image: k8s.gcr.io/echoserver:1.4
-          volumeMounts:
-          - mountPath: /etc/myapp # will have a "myapp.yaml" file
-            name: config
+      - name: main
+        image: docker.io/paulbouwer/hello-kubernetes:1.8
+        volumeMounts:
+        - mountPath: /etc/myapp # will have a "myapp.yaml" file
+          name: config
       volumes:
       - name: config
         configMap:
@@ -41,8 +41,8 @@ metadata:
 
 spec:
   containers:
-    - name: main
-      image: k8s.gcr.io/echoserver:1.4
+  - name: main
+    image: docker.io/paulbouwer/hello-kubernetes:1.8
 
 ---
 
@@ -56,8 +56,8 @@ metadata:
 
 spec:
   containers:
-    - name: main
-      image: k8s.gcr.io/echoserver:1.4
+  - name: main
+    image: docker.io/paulbouwer/hello-kubernetes:1.8
 
 ---
 
@@ -76,9 +76,11 @@ data:
     database-url: <%
         let addresses = [];
         let databases = k8s.select({kind: 'Pod', labels: {app: 'mariadb'}});
-        if (databases.length === 0)
-          throw 'no database nodes';
-        for (let d = 0; d < databases.length; d++)
-            addresses.push(databases[d].status.podIP);
+        if (!databases.length) throw 'no database nodes';
+        for (let d = 0; d < databases.length; d++) {
+            let address = databases[d].status.podIP;
+            if (!address) throw 'missing address';
+            addresses.push(address);
+        }
         write('jdbc:mariadb:loadbalance://' + addresses.join(',') + '/mydb');
     %>

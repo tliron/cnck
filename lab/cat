@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+. "$HERE/../scripts/_env"
+
+kubectl exec $(kubectl get pods --selector=app=myapp --output=jsonpath={.items[0].metadata.name}) -- cat /etc/myapp/myapp.yaml
