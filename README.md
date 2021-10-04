@@ -15,6 +15,9 @@ Kubernetes resources to pull data and generate contextual configuration text. It
 configurations up to date. Couple it with the [Reloader operator](https://github.com/stakater/Reloader) that
 will make sure to restart your components when the configurations change.
 
+CNCK is very lightweight and requires no special permissions, so it is very easy to package it with the rest
+of the workload.
+
 
 How It Works
 ------------
