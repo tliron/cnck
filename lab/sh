@@ -4,4 +4,4 @@ set -e
 HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
 . "$HERE/../scripts/_env"
 
-kubectl exec deployment/myapp -- cat /etc/myapp/myapp.yaml
+kubectl exec deployment/myapp -it -- sh

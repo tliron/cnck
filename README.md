@@ -108,7 +108,7 @@ See the [examples directory](examples/) for more information.
 Installation
 ------------
 
-You can install the operator using [this manifest](assets/kubernetes/cnck-operator.yaml) as a template.
+You can install the operator using [this manifest](assets/kubernetes/cnck.yaml) as a template.
 For example:
 
-    curl -s https://raw.githubusercontent.com/tliron/cnck/main/assets/kubernetes/cnck-operator.yaml | NAMESPACE=default VERSION=1.0 envsubst | kubectl apply -f -
+    curl -s https://raw.githubusercontent.com/tliron/cnck/main/assets/kubernetes/cnck.yaml | NAMESPACE=default VERSION=1.0 envsubst | kubectl apply -f -

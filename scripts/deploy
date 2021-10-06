@@ -21,7 +21,7 @@ export VERSION=1.0
 kubectl create namespace "$NAMESPACE" || true
 
 m "deploying operator to namespace \"$NAMESPACE\"..."
-kubectl_apply_template "$ROOT/assets/kubernetes/cnck-operator.yaml"
+kubectl_apply_template "$ROOT/assets/kubernetes/cnck.yaml"
 
 m "waiting for operator to start..."
 kubectl_wait_for_deployment cnck-operator

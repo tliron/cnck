@@ -4,4 +4,4 @@ set -e
 HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
 . "$HERE/../scripts/_env"
 
-kubectl logs $(kubectl get pods --selector=app.kubernetes.io/name=cnck-operator --output=jsonpath={.items[0].metadata.name}) "$@"
+kubectl logs deployment/cnck-operator "$@"
