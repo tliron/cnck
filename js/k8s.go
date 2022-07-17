@@ -25,18 +25,18 @@ func (self *K8s) Select(config ard.StringMap) ([]ard.StringMap, error) {
 	labels := make(map[string]string)
 
 	node := ard.NewNode(config)
-	gvk.Group, _ = node.Get("group").String(false)
-	gvk.Version, _ = node.Get("version").String(false)
+	gvk.Group, _ = node.Get("group").String()
+	gvk.Version, _ = node.Get("version").String()
 	if gvk.Version == "" {
 		gvk.Version = "v1"
 	}
-	gvk.Kind, _ = node.Get("kind").String(false)
-	namespace, _ = node.Get("namespace").String(false)
+	gvk.Kind, _ = node.Get("kind").String()
+	namespace, _ = node.Get("namespace").String()
 	if namespace == "" {
 		namespace = self.namespace
 	}
 
-	if labels_, ok := node.Get("labels").StringMap(false); ok {
+	if labels_, ok := node.Get("labels").StringMap(); ok {
 		for key, value := range labels_ {
 			labels[key] = fmt.Sprintf("%s", value)
 		}

@@ -25,7 +25,7 @@ How It Works
 An example of a ConfigMap with an embedded scriptlet to gather all running database pods and configure a
 loadbalancing connection to them:
 
-```
+```yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -52,7 +52,7 @@ data:
 4. CNCK will set the result in a new data key, without the `.template` extension, so the final
    result could look something like this:
 
-```
+```yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -73,7 +73,7 @@ data:
 6. An example of a Deployment that mounts this ConfigMap and has a
    [Reloader](https://github.com/stakater/Reloader) annotation:
 
-```
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:

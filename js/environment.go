@@ -7,6 +7,7 @@ import (
 	"github.com/dop251/goja"
 	"github.com/tliron/kutil/js"
 	urlpkg "github.com/tliron/kutil/url"
+	"github.com/tliron/kutil/util"
 )
 
 func (self *Context) NewEnvironment(builder *strings.Builder, scriptlet string) *js.Environment {
@@ -15,7 +16,7 @@ func (self *Context) NewEnvironment(builder *strings.Builder, scriptlet string) 
 	environment.CreateResolver = func(url urlpkg.URL, context *js.Context) js.ResolveFunc {
 		return func(id string, raw bool) (urlpkg.URL, error) {
 			url := urlpkg.NewInternalURL(id, self.URLContext)
-			url.Content = scriptlet
+			url.Content = util.StringToBytes(scriptlet)
 			return url, nil
 		}
 	}
