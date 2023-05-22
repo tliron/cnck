@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/tliron/kutil/ard"
+	"github.com/tliron/go-ard"
 	kubernetesutil "github.com/tliron/kutil/kubernetes"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )

@@ -4,8 +4,8 @@ import (
 	contextpkg "context"
 	"time"
 
+	"github.com/tliron/commonlog"
 	kubernetesutil "github.com/tliron/kutil/kubernetes"
-	"github.com/tliron/kutil/logging"
 	core "k8s.io/api/core/v1"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	dynamicpkg "k8s.io/client-go/dynamic"
@@ -33,7 +33,7 @@ type Controller struct {
 	ConfigMaps listers.ConfigMapLister
 
 	Context contextpkg.Context
-	Log     logging.Logger
+	Log     commonlog.Logger
 }
 
 func NewController(toolName string, cluster bool, namespace string, kubernetes kubernetes.Interface, dynamic dynamicpkg.Interface, informerResyncPeriod time.Duration, stopChannel <-chan struct{}) *Controller {
@@ -43,7 +43,7 @@ func NewController(toolName string, cluster bool, namespace string, kubernetes k
 		namespace = ""
 	}
 
-	log := logging.GetLoggerf("%s.controller", toolName)
+	log := commonlog.GetLoggerf("%s.controller", toolName)
 
 	self := Controller{
 		Namespace:   namespace,

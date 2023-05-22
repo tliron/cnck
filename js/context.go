@@ -3,9 +3,9 @@ package js
 import (
 	"context"
 
+	"github.com/tliron/commonlog"
+	urlpkg "github.com/tliron/exturl"
 	kubernetesutil "github.com/tliron/kutil/kubernetes"
-	"github.com/tliron/kutil/logging"
-	urlpkg "github.com/tliron/kutil/url"
 )
 
 //
@@ -17,10 +17,10 @@ type Context struct {
 	Dynamic    *kubernetesutil.Dynamic
 	Context    context.Context
 	URLContext *urlpkg.Context
-	Log        logging.Logger
+	Log        commonlog.Logger
 }
 
-func NewContext(namespace string, dynamic *kubernetesutil.Dynamic, context context.Context, urlContext *urlpkg.Context, log logging.Logger) *Context {
+func NewContext(namespace string, dynamic *kubernetesutil.Dynamic, context context.Context, urlContext *urlpkg.Context, log commonlog.Logger) *Context {
 	return &Context{
 		Namespace:  namespace,
 		Dynamic:    dynamic,

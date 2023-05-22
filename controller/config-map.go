@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/tliron/cnck/js"
-	"github.com/tliron/kutil/logging"
-	urlpkg "github.com/tliron/kutil/url"
+	"github.com/tliron/commonlog"
+	urlpkg "github.com/tliron/exturl"
 	core "k8s.io/api/core/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -40,7 +40,7 @@ func (self *Controller) processConfigMap(configMap *core.ConfigMap) (bool, error
 				if script, err := js.Compile(template); err == nil {
 					urlContext := urlpkg.NewContext()
 					defer urlContext.Release()
-					context := js.NewContext(self.Namespace, self.Dynamic, self.Context, urlContext, logging.NewScopeLogger(self.Log, "js"))
+					context := js.NewContext(self.Namespace, self.Dynamic, self.Context, urlContext, commonlog.NewScopeLogger(self.Log, "js"))
 
 					if rendered, err := context.Render(script); err == nil {
 						self.Log.Infof("rendered: %s", renderedName)

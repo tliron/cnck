@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
+	urlpkg "github.com/tliron/exturl"
 	"github.com/tliron/kutil/js"
-	urlpkg "github.com/tliron/kutil/url"
 	"github.com/tliron/kutil/util"
 )
 
