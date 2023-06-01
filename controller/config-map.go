@@ -5,7 +5,7 @@ import (
 
 	"github.com/tliron/cnck/js"
 	"github.com/tliron/commonlog"
-	urlpkg "github.com/tliron/exturl"
+	"github.com/tliron/exturl"
 	core "k8s.io/api/core/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -38,7 +38,7 @@ func (self *Controller) processConfigMap(configMap *core.ConfigMap) (bool, error
 			if template, ok := configMap.Data[templateName]; ok {
 				renderedName := templateName[:len(templateName)-len(templateSuffix)]
 				if script, err := js.Compile(template); err == nil {
-					urlContext := urlpkg.NewContext()
+					urlContext := exturl.NewContext()
 					defer urlContext.Release()
 					context := js.NewContext(self.Namespace, self.Dynamic, self.Context, urlContext, commonlog.NewScopeLogger(self.Log, "js"))
 

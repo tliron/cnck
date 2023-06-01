@@ -5,23 +5,23 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
-	urlpkg "github.com/tliron/exturl"
-	"github.com/tliron/kutil/js"
+	"github.com/tliron/commonjs-goja"
+	"github.com/tliron/exturl"
 	"github.com/tliron/kutil/util"
 )
 
-func (self *Context) NewEnvironment(builder *strings.Builder, scriptlet string) *js.Environment {
-	environment := js.NewEnvironment(self.URLContext, nil)
+func (self *Context) NewEnvironment(builder *strings.Builder, scriptlet string) *commonjs.Environment {
+	environment := commonjs.NewEnvironment(self.URLContext, nil)
 
-	environment.CreateResolver = func(url urlpkg.URL, context *js.Context) js.ResolveFunc {
-		return func(id string, raw bool) (urlpkg.URL, error) {
-			url := urlpkg.NewInternalURL(id, self.URLContext)
+	environment.CreateResolver = func(url exturl.URL, context *commonjs.Context) commonjs.ResolveFunc {
+		return func(id string, raw bool) (exturl.URL, error) {
+			url := self.URLContext.NewInternalURL(id)
 			url.Content = util.StringToBytes(scriptlet)
 			return url, nil
 		}
 	}
 
-	environment.Extensions = []js.Extension{
+	environment.Extensions = []commonjs.Extension{
 		{
 			Name:   "k8s",
 			Create: self.createK8sExtension,
@@ -39,11 +39,11 @@ func (self *Context) NewEnvironment(builder *strings.Builder, scriptlet string) 
 	return environment
 }
 
-func (self *Context) createLogExtension(context *js.Context) goja.Value {
+func (self *Context) createLogExtension(context *commonjs.Context) goja.Value {
 	return context.Environment.Runtime.ToValue(self.Log)
 }
 
-func (self *Context) createK8sExtension(context *js.Context) goja.Value {
+func (self *Context) createK8sExtension(context *commonjs.Context) goja.Value {
 	k8s := K8s{
 		namespace: self.Namespace,
 		dynamic:   self.Dynamic,
@@ -52,13 +52,13 @@ func (self *Context) createK8sExtension(context *js.Context) goja.Value {
 	return context.Environment.Runtime.ToValue(&k8s)
 }
 
-func createWriteExtension(builder *strings.Builder) js.CreateExtensionFunc {
+func createWriteExtension(builder *strings.Builder) commonjs.CreateExtensionFunc {
 	write := func(arg interface{}) error {
 		_, err := builder.WriteString(fmt.Sprintf("%s", arg))
 		return err
 	}
 
-	return func(context *js.Context) goja.Value {
+	return func(context *commonjs.Context) goja.Value {
 		return context.Environment.Runtime.ToValue(write)
 	}
 }
